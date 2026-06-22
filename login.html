@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUSHKAR VVIP PANNEL - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:0.5}50%{opacity:1} }
+        .login-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            width: 420px;
+            position: relative;
+            animation: slideUp 0.6s ease;
+        }
+        @keyframes slideUp { from{transform:translateY(50px) scale(0.9);opacity:0} to{transform:translateY(0) scale(1);opacity:1} }
+        .login-header { text-align:center; margin-bottom:35px; }
+        .login-header .crown { font-size:50px; display:block; margin-bottom:10px; animation:glow 2s ease-in-out infinite; }
+        @keyframes glow { 0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{text-shadow:0 0 40px rgba(255,215,0,0.6)} }
+        .login-header h1 { color:#ffd700; font-size:32px; font-weight:800; text-shadow:0 0 30px rgba(255,215,0,0.3); letter-spacing:2px; }
+        .login-header .subtitle { color:rgba(255,255,255,0.6); font-size:14px; margin-top:8px; letter-spacing:3px; }
+        .form-group { margin-bottom:22px; }
+        .form-group label { display:block; margin-bottom:8px; color:rgba(255,255,255,0.8); font-weight:600; font-size:14px; letter-spacing:1px; }
+        .form-group input {
+            width:100%; padding:14px 18px;
+            background:rgba(255,255,255,0.08);
+            border:2px solid rgba(255,255,255,0.1);
+            border-radius:12px;
+            font-size:15px;
+            color:white;
+            transition:all 0.3s;
+        }
+        .form-group input::placeholder { color:rgba(255,255,255,0.3); }
+        .form-group input:focus { outline:none; border-color:#ffd700; background:rgba(255,255,255,0.12); box-shadow:0 0 30px rgba(255,215,0,0.1); }
+        .login-btn {
+            width:100%; padding:16px;
+            background:linear-gradient(135deg, #ffd700 0%, #f7971e 100%);
+            color:#1a1a2e;
+            border:none;
+            border-radius:12px;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+            transition:all 0.3s;
+            letter-spacing:2px;
+            text-transform:uppercase;
+        }
+        .login-btn:hover { transform:scale(1.02); box-shadow:0 10px 40px rgba(255,215,0,0.3); }
+        .error { background:rgba(255,0,0,0.15); color:#ff6b6b; padding:12px; border-radius:10px; margin-bottom:18px; text-align:center; border:1px solid rgba(255,0,0,0.2); }
+        .panel-footer { text-align:center; font-size:12px; color:rgba(255,255,255,0.3); margin-top:25px; letter-spacing:1px; }
+        .panel-footer .gold { color:#ffd700; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <span class="crown">👑</span>
+            <h1>PUSHKAR VVIP</h1>
+            <div class="subtitle">✦ PREMIUM KEY MANAGEMENT ✦</div>
+        </div>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <label>👤 Username</label>
+                <input type="text" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label>🔒 Password</label>
+                <input type="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="login-btn">✦ Enter Panel ✦</button>
+        </form>
+        <div class="panel-footer">
+            © 2026 <span class="gold">PUSHKAR VVIP PANNEL</span> • All Rights Reserved
+        </div>
+    </div>
+</body>
+</html>
