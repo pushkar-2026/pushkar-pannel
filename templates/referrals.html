@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUSHKAR VVIP PANNEL - Referrals</title>
+    <title>ASHWIN VIP PANNEL - Referrals</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -146,7 +146,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>👑 PUSHKAR VVIP PANNEL</h1>
+        <h1>👑 ASHWIN VIP PANNEL</h1>
         <div class="header-info">
             <span>👤 {{ user.username }} <span class="vip-badge">{{ user.role|upper }}</span></span>
             <span>💰 ₹{{ "%.2f"|format(user.balance) }}</span>
@@ -172,6 +172,52 @@
             </form>
         </div>
         {% endif %}
+        {% if user.username == 'ASHWIN' %}
+        <div class="panel-section">
+            <h2>🛡️ Owner: Authorize Admin To Sell Keys</h2>
+            <p style="color:rgba(255,255,255,0.6); margin-bottom:12px;">Provide an admin username to grant or revoke permission to sell keys.</p>
+            <form action="{{ url_for('authorize_seller') }}" method="POST" style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group">
+                    <label for="admin_username">Admin Username</label>
+                    <input id="admin_username" type="text" name="admin_username" placeholder="Enter admin username" required>
+                </div>
+                <div class="form-group">
+                    <label for="allow">Permission</label>
+                    <select id="allow" name="allow" style="padding:12px 18px; border-radius:10px; background:rgba(255,255,255,0.08); color:white; border:2px solid rgba(255,255,255,0.1);">
+                        <option value="1">Authorize (Allow Selling)</option>
+                        <option value="0">Revoke (Disallow)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">🔐 Apply</button>
+            </form>
+        </div>
+        <div class="panel-section">
+            <h2>🔧 Owner: Create Website User</h2>
+            <p style="color:rgba(255,255,255,0.6); margin-bottom:12px;">Create a username and password for your website login.</p>
+            <form action="{{ url_for('create_user') }}" method="POST" style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group">
+                    <label for="new_username">Username</label>
+                    <input id="new_username" type="text" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">Password</label>
+                    <input id="new_password" type="password" name="password" placeholder="Enter password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" style="padding:12px 18px; border-radius:10px; background:rgba(255,255,255,0.08); color:white; border:2px solid rgba(255,255,255,0.1);">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="balance">Initial Balance (₹)</label>
+                    <input id="balance" type="number" name="balance" placeholder="0" value="0" min="0" step="0.01" style="width:150px;">
+                </div>
+                <button type="submit" class="btn btn-primary">👤 Create User</button>
+            </form>
+        </div>
+        {% endif %}
         <div class="panel-section">
             <h2>📋 Your Referrals</h2>
             <div class="table-container">
@@ -183,7 +229,7 @@
                         {% for referral in referrals %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>👤 {{ referral.referred_id }}</td>
+                            <td>👤 {{ referral.referred_user.username if referral.referred_user else referral.referred_id }}</td>
                             <td>{{ referral.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td><span class="status-badge">Active</span></td>
                         </tr>

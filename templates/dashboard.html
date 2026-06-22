@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUSHKAR VVIP PANNEL - Dashboard</title>
+    <title>ASHWIN VIP PANNEL - Dashboard</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -111,6 +111,17 @@
         .btn-danger { background:#ef5350; color:white; }
         .btn-success { background:#66bb6a; color:white; }
         .btn-warning { background:#ffa726; color:#1a1a2e; }
+        .btn-sm {
+            padding:6px 14px;
+            border:none;
+            border-radius:6px;
+            font-weight:600;
+            font-size:12px;
+            cursor:pointer;
+            transition:all 0.3s;
+            margin:2px;
+        }
+        .btn-sm:hover { transform:scale(1.05); }
         .keys-list { margin-top:20px; }
         .key-item {
             display:flex;
@@ -119,6 +130,7 @@
             padding:14px 18px;
             border-bottom:1px solid rgba(255,255,255,0.05);
             transition:all 0.3s;
+            flex-wrap:wrap;
         }
         .key-item:hover { background:rgba(255,255,255,0.03); }
         .key-item .key-code { font-family:'Courier New', monospace; font-weight:600; color:#ffd700; font-size:16px; }
@@ -175,6 +187,11 @@
             letter-spacing:1px;
             margin-left:5px;
         }
+        .action-buttons {
+            display:flex;
+            gap:5px;
+            flex-wrap:wrap;
+        }
         @media (max-width:768px) {
             .header { flex-direction:column; gap:15px; padding:15px; }
             .header-info { flex-wrap:wrap; justify-content:center; }
@@ -186,7 +203,7 @@
 </head>
 <body>
     <div class="header">
-        <h1><span class="crown">👑</span> PUSHKAR VVIP PANNEL</h1>
+        <h1><span class="crown">👑</span> ASHWIN VIP PANNEL</h1>
         <div class="header-info">
             <span class="user-badge">👤 {{ user.username }} <span class="vip-badge">{{ user.role|upper }}</span></span>
             <span class="balance">💰 ₹{{ "%.2f"|format(user.balance) }}</span>
@@ -208,20 +225,22 @@
             <div class="stat-card"><h3>📦 Total Keys</h3><div class="number">{{ total_keys }}</div></div>
             <div class="stat-card"><h3>💰 Your Balance</h3><div class="number">₹{{ "%.2f"|format(user.balance) }}</div></div>
         </div>
+        <!-- Generate Keys -->
         <div class="panel-section">
             <h2>🔑 Generate New Keys</h2>
             <form class="generate-form" id="generateForm">
                 <input type="number" name="quantity" min="1" max="100" value="1" required>
                 <select name="validity_type" required>
-                    <option value="day">📅 1 Day</option>
-                    <option value="week">📅 1 Week</option>
-                    <option value="month">📅 1 Month</option>
-                    <option value="session">⏰ Session (24hrs)</option>
+                    <option value="day">📅 1 Day (₹75)</option>
+                    <option value="week">📅 1 Week (₹400)</option>
+                    <option value="month">📅 1 Month (₹1500)</option>
+                    <option value="session">⏰ Session (24hrs) (₹25)</option>
                 </select>
                 <button type="submit" class="btn btn-primary">✨ Generate</button>
             </form>
             <div id="generatedKeys" style="margin-top:18px;"></div>
         </div>
+        <!-- Check Key -->
         <div class="panel-section">
             <h2>🔍 Check Key Validity</h2>
             <form id="checkKeyForm" style="display:flex; gap:15px; flex-wrap:wrap;">
@@ -230,6 +249,16 @@
             </form>
             <div id="checkResult" style="margin-top:15px;"></div>
         </div>
+        <!-- Use Key -->
+        <div class="panel-section">
+            <h2>🎯 Use a Key (Redeem)</h2>
+            <form id="useKeyForm" style="display:flex; gap:15px; flex-wrap:wrap;">
+                <input type="text" name="key" placeholder="Enter key to redeem" style="flex:1; padding:12px 18px; background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.1); border-radius:10px; color:white; min-width:200px;">
+                <button type="submit" class="btn btn-success">✅ Redeem</button>
+            </form>
+            <div id="useResult" style="margin-top:15px;"></div>
+        </div>
+        <!-- Recent Keys -->
         <div class="panel-section">
             <h2>📋 Your Recent Keys</h2>
             <div class="keys-list">
@@ -240,12 +269,23 @@
                         {% if key.is_used %}✓ Used{% elif key.expires_at < now %}⏰ Expired{% else %}● Active{% endif %}
                     </span>
                     <span style="font-size:12px; color:rgba(255,255,255,0.4);">{{ key.validity_type|upper }} | Exp: {{ key.expires_at.strftime('%Y-%m-%d') }}</span>
+                    <div class="action-buttons">
+                        {% if user.role == 'admin' %}
+                        <form action="{{ url_for('delete_key', key_id=key.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Delete this key?')">Delete</button>
+                        </form>
+                        <form action="{{ url_for('extend_key', key_id=key.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-sm btn-warning">Extend</button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
     <script>
+        // Generate Keys
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -257,7 +297,10 @@
                     document.getElementById('generatedKeys').innerHTML = 
                         '<div style="background:rgba(102,187,106,0.1); padding:18px; border-radius:12px; border:1px solid rgba(102,187,106,0.2);">' +
                         '<strong style="color:#66bb6a;">✨ Generated Keys:</strong><br><br>' +
-                        data.keys.map(k => '<code style="display:inline-block; background:rgba(255,255,255,0.05); padding:6px 14px; margin:4px; border-radius:6px; border:1px solid rgba(255,215,0,0.2); color:#ffd700;">' + k + '</code>').join('') +
+                        data.keys.map(k => '<div style="display:flex; align-items:center; gap:10px; margin:4px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid rgba(255,215,0,0.2);">' +
+                            '<code style="flex:1; font-family:\'Courier New\', monospace; font-weight:600; color:#ffd700;">' + k + '</code>' +
+                            '<button class="btn btn-sm btn-primary" onclick="copyKey(\'' + k + '\')" type="button">Copy</button>' +
+                        '</div>').join('') +
                         '</div>';
                     setTimeout(() => location.reload(), 2000);
                 } else {
@@ -267,6 +310,8 @@
                 showNotification('❌ An error occurred', 'error');
             }
         });
+
+        // Check Key
         document.getElementById('checkKeyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -290,11 +335,43 @@
                 showNotification('❌ An error occurred', 'error');
             }
         });
+
+        // Use Key (Redeem)
+        document.getElementById('useKeyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const response = await fetch('/use_key', { method:'POST', body:formData });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('useResult').innerHTML = 
+                        '<div style="background:rgba(102,187,106,0.1); padding:18px; border-radius:12px; border:1px solid rgba(102,187,106,0.2);">' +
+                        '✅ ' + data.message + '<br>💰 New Balance: ₹' + data.balance +
+                        '</div>';
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    document.getElementById('useResult').innerHTML = 
+                        '<div style="background:rgba(239,83,80,0.1); padding:18px; border-radius:12px; border:1px solid rgba(239,83,80,0.2);">' +
+                        '❌ ' + data.message +
+                        '</div>';
+                }
+            } catch (error) {
+                showNotification('❌ An error occurred', 'error');
+            }
+        });
+
         function showNotification(message, type) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
             notification.className = 'notification show ' + type;
             setTimeout(() => { notification.className = 'notification'; }, 5000);
+        }
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showNotification('✅ Key copied to clipboard', 'success');
+            }).catch(() => {
+                showNotification('❌ Copy failed, please copy manually', 'error');
+            });
         }
         function showAPKConnect() {
             showNotification('📱 APK Connect: /apk_connect endpoint available', 'success');
