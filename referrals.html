@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUSHKAR VVIP PANNEL - Referrals</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:#0a0a1a;
+            color:white;
+        }
+        .header {
+            background:linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding:18px 35px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom:2px solid rgba(255,215,0,0.2);
+        }
+        .header h1 { color:#ffd700; font-size:26px; }
+        .header-info { display:flex; align-items:center; gap:20px; }
+        .logout-btn {
+            background:rgba(255,0,0,0.2);
+            color:#ff6b6b;
+            padding:8px 22px;
+            border:2px solid #ff6b6b;
+            border-radius:10px;
+            cursor:pointer;
+            text-decoration:none;
+        }
+        .container { max-width:1400px; margin:30px auto; padding:0 25px; }
+        .nav-links {
+            display:flex;
+            gap:15px;
+            margin-bottom:25px;
+            padding-bottom:18px;
+            border-bottom:2px solid rgba(255,255,255,0.05);
+            flex-wrap:wrap;
+        }
+        .nav-links a {
+            color:rgba(255,255,255,0.5);
+            text-decoration:none;
+            font-weight:600;
+            padding:10px 22px;
+            border-radius:10px;
+            transition:all 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background:rgba(255,215,0,0.15);
+            color:#ffd700;
+        }
+        .panel-section {
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(10px);
+            border-radius:18px;
+            padding:28px;
+            border:1px solid rgba(255,255,255,0.08);
+            margin-bottom:25px;
+        }
+        .panel-section h2 { color:#ffd700; margin-bottom:22px; }
+        .btn {
+            padding:12px 28px;
+            border:none;
+            border-radius:10px;
+            font-weight:700;
+            cursor:pointer;
+            transition:all 0.3s;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            font-size:13px;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg, #ffd700 0%, #f7971e 100%);
+            color:#1a1a2e;
+        }
+        .btn-primary:hover { transform:scale(1.05); box-shadow:0 10px 30px rgba(255,215,0,0.3); }
+        .btn-sm {
+            padding:6px 14px;
+            border:none;
+            border-radius:6px;
+            font-weight:600;
+            font-size:12px;
+            cursor:pointer;
+            transition:all 0.3s;
+        }
+        .btn-sm:hover { transform:scale(1.05); }
+        .btn-danger { background:#ef5350; color:white; }
+        .table-container { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        th {
+            text-align:left;
+            padding:14px 18px;
+            color:rgba(255,255,255,0.5);
+            font-weight:600;
+            font-size:13px;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            border-bottom:2px solid rgba(255,255,255,0.05);
+        }
+        td {
+            padding:14px 18px;
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            color:rgba(255,255,255,0.8);
+        }
+        .vip-badge {
+            display:inline-block;
+            padding:2px 12px;
+            background:linear-gradient(135deg, #ffd700, #f7971e);
+            color:#1a1a2e;
+            border-radius:10px;
+            font-size:10px;
+            font-weight:700;
+            margin-left:5px;
+        }
+        .form-group { margin-bottom:15px; }
+        .form-group input {
+            padding:12px 18px;
+            background:rgba(255,255,255,0.08);
+            border:2px solid rgba(255,255,255,0.1);
+            border-radius:10px;
+            color:white;
+            width:300px;
+            transition:all 0.3s;
+        }
+        .form-group input:focus {
+            outline:none;
+            border-color:#ffd700;
+        }
+        .status-badge {
+            padding:4px 14px;
+            border-radius:20px;
+            font-size:12px;
+            font-weight:600;
+            background:rgba(102,187,106,0.2);
+            color:#66bb6a;
+        }
+        @media (max-width:768px) {
+            .header { flex-direction:column; gap:15px; padding:15px; }
+            .header-info { flex-wrap:wrap; justify-content:center; }
+            .container { padding:0 15px; }
+            .form-group input { width:100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👑 PUSHKAR VVIP PANNEL</h1>
+        <div class="header-info">
+            <span>👤 {{ user.username }} <span class="vip-badge">{{ user.role|upper }}</span></span>
+            <span>💰 ₹{{ "%.2f"|format(user.balance) }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+            <a href="{{ url_for('view_keys') }}">🔑 Keys</a>
+            <a href="{{ url_for('manage_users') }}">👥 Users</a>
+            <a href="{{ url_for('manage_referrals') }}" class="active">🔗 Referrals</a>
+        </div>
+        {% if user.role == 'admin' %}
+        <div class="panel-section">
+            <h2>🔗 Create Referral</h2>
+            <form action="{{ url_for('create_referral') }}" method="POST" style="display:flex; gap:15px; flex-wrap:wrap; align-items:end;">
+                <div class="form-group">
+                    <label style="display:block; margin-bottom:8px; color:rgba(255,255,255,0.5);">Username</label>
+                    <input type="text" name="username" placeholder="Enter username" required>
+                </div>
+                <button type="submit" class="btn btn-primary">✨ Create Referral</button>
+            </form>
+        </div>
+        {% endif %}
+        <div class="panel-section">
+            <h2>📋 Your Referrals</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Referred User</th><th>Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for referral in referrals %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>👤 {{ referral.referred_id }}</td>
+                            <td>{{ referral.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td><span class="status-badge">Active</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:rgba(255,255,255,0.3); padding:30px;">
+                                No referrals yet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
