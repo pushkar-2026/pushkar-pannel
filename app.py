@@ -172,6 +172,38 @@ def api_login():
         }
     }), 200
 
+@app.route('/apk_login', methods=['POST'])
+def apk_login():
+    """APK Login endpoint - Validates license key and returns key details"""
+    data = request.get_json()
+    if not data or 'key' not in data:
+        return jsonify({'success': False, 'message': 'Key required'}), 400
+    
+    key_str = data['key'].strip()
+    key = Key.query.filter_by(key=key_str).first()
+    
+    if not key:
+        return jsonify({'success': False, 'message': 'Invalid key'}), 404
+    
+    if not key.is_active:
+        return jsonify({'success': False, 'message': 'Key is inactive'}), 403
+    
+    if key.is_used:
+        return jsonify({'success': False, 'message': 'Key already used'}), 403
+    
+    if key.expires_at < datetime.utcnow():
+        return jsonify({'success': False, 'message': 'Key has expired'}), 403
+    
+    return jsonify({
+        'success': True,
+        'message': 'Login successful',
+        'data': {
+            'key': key.key,
+            'type': key.validity_type,
+            'expires': key.expires_at.isoformat()
+        }
+    }), 200
+
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -516,7 +548,8 @@ def apk_connect():
         'api_endpoints': {
             'check_key': '/check_key',
             'use_key': '/use_key',
-            'stats': '/api/stats'
+            'stats': '/api/stats',
+            'apk_login': '/apk_login'
         },
         'server_time': datetime.utcnow().isoformat()
     })
@@ -524,3 +557,4 @@ def apk_connect():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 2487))
     app.run(debug=False, host='0.0.0.0', port=port)
+
